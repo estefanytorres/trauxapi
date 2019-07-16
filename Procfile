@@ -1,0 +1,1 @@
+web: gunicorn trauxerp_api_dev.wsgi
