@@ -1,5 +1,5 @@
 from .base import *
 
 DEBUG = False
-ALLOWED_HOSTS = ['trauxapi.herokuapp.com']
+ALLOWED_HOSTS = ['trauxapi-dev.herokuapp.com']
 ENV = 'PRD'
