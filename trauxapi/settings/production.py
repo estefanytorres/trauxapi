@@ -1,5 +1,9 @@
 from .base import *
 
+ENV = 'PRD'
+PRODUCTION = True
 DEBUG = False
 ALLOWED_HOSTS = ['trauxapi.herokuapp.com']
-ENV = 'PRD'
+CORS_ORIGIN_WHITELIST = [
+    "https://trauxweb.herokuapp.com",
+]

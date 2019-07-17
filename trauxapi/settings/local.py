@@ -1,7 +1,11 @@
 from .base import *
 
+ENV = 'LOC'
+PRODUCTION = False
 DEBUG = True
 ALLOWED_HOSTS = ['*']
-ENV = 'LOC'
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:4200"
+]
 
 
