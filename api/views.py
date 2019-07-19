@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer, WebConsultSerializer
 from .models import WebConsult
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+from django.http import JsonResponse
 
 
 #######################################################################################################################
@@ -29,17 +30,20 @@ def send_email(title, content, html_content, send_from, send_to):
     email.send()
 
 
+
 #######################################################################################################################
 #                                                   REST ViewSets                                                     #
 #######################################################################################################################
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class WebConsultViewSet(viewsets.ModelViewSet):
     queryset = WebConsult.objects.all()
     serializer_class = WebConsultSerializer
+    http_method_names = ['post']
     permission_classes = [AllowAny]
 
     link_youtube_instructions = 'https://youtu.be/IW10vAp9Lbw'
