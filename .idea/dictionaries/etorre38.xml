@@ -5,6 +5,7 @@
       <w>postgresql</w>
       <w>sendgrid</w>
       <w>smtp</w>
+      <w>traux</w>
       <w>trauxapi</w>
     </words>
   </dictionary>
