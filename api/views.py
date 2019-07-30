@@ -80,7 +80,7 @@ class WebConsultViewSet(viewsets.ModelViewSet):
                     'Si llegas a tener cualquier duda por favor comunícate con nosotros respondiento a este '
                     'correo que con gusto te ayudaremos! \n\n \n\n'
                     'De nuevo muchas gracias,\n\n \n\n'
-                    'El equipo traux\n\n \n\n' % (self.link_youtube_instructions, self.link_download_demo),
+                    'El equipo traux\n\n \n\n' % (self.link_download_demo, self.link_youtube_instructions),
                     '<h2>Hola %s!</h2>' % (serializer.validated_data['name']) +
                     '<p>Te felicito por iniciar tu camino hacia organizar y mejorar los procesos de negocio de tu '
                     'empresa, de parte de todo el equipo traux te damos las gracias por considerarnos como opción, '
@@ -94,7 +94,7 @@ class WebConsultViewSet(viewsets.ModelViewSet):
                     '<p>Si llegas a tener cualquier duda por favor comunícate con nosotros respondiento a este '
                     'correo que con gusto te ayudaremos!</p>'
                     '<p>De nuevo muchas gracias,<br>'
-                    'El equipo traux</p>' % (self.link_youtube_instructions, self.link_download_demo) +
+                    'El equipo traux</p>' % (self.link_download_demo, self.link_youtube_instructions) +
                     '<img src="%s">' % self.link_traux_logo,
                     'info@trauxerp.com',
                     [serializer.validated_data['email']]
