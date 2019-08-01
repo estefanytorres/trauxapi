@@ -46,7 +46,7 @@ class WebConsultViewSet(viewsets.ModelViewSet):
     http_method_names = ['post']
     permission_classes = [AllowAny]
 
-    link_youtube_instructions = 'https://youtu.be/IW10vAp9Lbw'
+    link_youtube_instructions = 'https://youtu.be/lpIwWB6anjs'
     link_download_demo = settings.CORS_ORIGIN_WHITELIST[0] + '/assets/downloads/Setup-TrauxERP.exe'
     link_traux_logo = settings.CORS_ORIGIN_WHITELIST[0] + '/assets/logo.png'
 
