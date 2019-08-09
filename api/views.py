@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer, WebConsultSerializer
 from .models import WebConsult
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-from django.http import JsonResponse
 
 
 #######################################################################################################################
@@ -37,6 +37,7 @@ def send_email(title, content, html_content, send_from, send_to):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
 
