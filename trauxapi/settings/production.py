@@ -8,6 +8,7 @@ CORS_ORIGIN_WHITELIST = [
     "https://trauxweb.herokuapp.com",
     "https://www.trauxerp.com",
     "https://trauxerp.com",
-    "http://www.trauxerp.com",
-    "http://trauxerp.com",
+    "https://trauxapp.herokuapp.com",
+    "https://www.account.trauxerp.com",
+    "https://account.trauxerp.com",
 ]
