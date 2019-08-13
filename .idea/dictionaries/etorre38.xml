@@ -4,6 +4,7 @@
       <w>apikey</w>
       <w>postgresql</w>
       <w>sendgrid</w>
+      <w>simplejwt</w>
       <w>smtp</w>
       <w>traux</w>
       <w>trauxapi</w>
