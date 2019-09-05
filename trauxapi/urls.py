@@ -5,10 +5,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenVerifyView,
 urlpatterns = [
     path(r'admin/', admin.site.urls),
     path('', include('api.urls')),
-    path(r'api-token-auth/', TokenObtainPairView.as_view()),
-    path(r'api-token-verify', TokenVerifyView.as_view()),
-    path(r'api-token-refresh/', TokenRefreshView.as_view()),
-
-
+    path(r'api-token/auth/', TokenObtainPairView.as_view()),
+    path(r'api-token/verify/', TokenVerifyView.as_view()),
+    path(r'api-token/refresh/', TokenRefreshView.as_view()),
+    # TODO: destroy token
+    # path(r'api-token/destroy/', TokenRefreshView.as_view()),
 ]
 

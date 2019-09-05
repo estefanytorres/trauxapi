@@ -2,6 +2,8 @@
   <dictionary name="etorre38">
     <words>
       <w>apikey</w>
+      <w>effdt</w>
+      <w>effseq</w>
       <w>postgresql</w>
       <w>sendgrid</w>
       <w>simplejwt</w>
