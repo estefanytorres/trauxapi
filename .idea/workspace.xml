@@ -58,7 +58,7 @@
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="17">
-              <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+              <caret line="1" column="5" lean-forward="true" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -235,12 +235,12 @@
       <workItem from="1565126086886" duration="20609000" />
       <workItem from="1566250159714" duration="3243000" />
       <workItem from="1566575775319" duration="1060000" />
-      <workItem from="1567115219783" duration="71384000" />
+      <workItem from="1567115219783" duration="71434000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="139996000" />
+    <option name="totallyTimeSpent" value="140046000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -670,7 +670,7 @@
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
-          <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+          <caret line="1" column="5" lean-forward="true" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
         </state>
       </provider>
     </entry>
