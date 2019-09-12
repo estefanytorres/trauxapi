@@ -1,7 +1,11 @@
-from django.core.mail import EmailMultiAlternatives
+# Django
 from django.conf import settings
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import EmailMultiAlternatives
+from django.utils import six
+# Local
 from .models import MessageSet, MessageCatalog
-
+# Installed packages
 from html2text import html2text
 
 
@@ -21,6 +25,20 @@ def send_email(sender, recipient, subject, body):
     email.send()
 
 
+def encode_email_address(email):
+    email_parts = email.split('@')
+    user = email_parts[0]
+    domain = email_parts[1]
+    length = len(user)
+    if length <= 2:
+        user = user[0] + '*'
+    elif length <= 5:
+        user = user[:1] + '*'*(length - 2) + user[-1:]
+    else:
+        user = user[:2] + '*'*(length-4) + user[-2:]
+    return user + '@' + domain
+
+
 def get_message(message_set_id, message_nbr):
     try:
         message_set = MessageSet.objects.get(message_set=message_set_id)
@@ -28,3 +46,11 @@ def get_message(message_set_id, message_nbr):
     except (MessageSet.DoesNotExist, MessageCatalog.DoesNotExist):
         message = ''
     return message
+
+
+class TokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        return (
+            six.text_type(user.pk) + six.text_type(timestamp) +
+            six.text_type(user.is_active)
+        )
