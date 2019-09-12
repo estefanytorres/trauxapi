@@ -1,6 +1,5 @@
 ### PyCharm ###
-.idea
-trauxapi\.idea
+**/.idea/
 
 ### Django ###
 *.log
