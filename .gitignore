@@ -1,8 +1,5 @@
-### Git ignore ###
-##################
-
 ### PyCharm ###
-**/.idea/
+.idea/
 
 ### Django ###
 *.log
