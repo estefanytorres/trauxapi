@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import EmailMultiAlternatives
 from django.utils import six
+# Rest Framework
+from rest_framework.response import Response
 # Local
 from .models import MessageSet, MessageCatalog
 # Installed packages
@@ -46,6 +48,17 @@ def get_message(message_set_id, message_nbr):
     except (MessageSet.DoesNotExist, MessageCatalog.DoesNotExist):
         message = ''
     return message
+
+
+def get_response(status, code, data=None):
+    message = get_message(status, code)
+    if status < 300:
+        return Response({'status': status, 'code': code, 'message': message, 'data': data}, status)
+    else:
+        if data:
+            return Response({'status': status, 'code': code, 'message': message, 'exception': data.__str__()}, status)
+        else:
+            return Response({'status': status, 'code': code, 'message': message}, status)
 
 
 class TokenGenerator(PasswordResetTokenGenerator):

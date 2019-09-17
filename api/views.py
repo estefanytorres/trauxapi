@@ -1,18 +1,17 @@
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from django.db import IntegrityError
-from django.utils.datastructures import MultiValueDictKeyError
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
 from .funclib import (
     send_email,
     get_message,
     TokenGenerator,
-    encode_email_address
+    encode_email_address,
+    get_response
 )
 from .serializers import *
 from .models import *
@@ -21,27 +20,6 @@ from .models import *
 #######################################################################################################################
 #                                                 Authentication                                                      #
 #######################################################################################################################
-
-
-def send_activation_email(user):
-    try:
-        user_profile = UserProfile.objects.get(user=user)
-        account_activation_token = TokenGenerator()
-        url = settings.CORS_ORIGIN_WHITELIST[1] + "/login/?action=activate&uid={}&token={}".format(
-            urlsafe_base64_encode(force_bytes(user.pk)),
-            account_activation_token.make_token(user)
-        )
-        send_email(
-            'noreply@trauxerp.com',
-            [user_profile.activation_license.client.email],
-            get_message(1000, 7),
-            get_message(1000, 8).format(user.first_name, url, url)
-        )
-        return True
-    except UserProfile.DoesNotExist as e:
-        return False
-    except IndexError:
-        return False
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -66,23 +44,31 @@ class UserViewSet(viewsets.ModelViewSet):
                 activation_license=activation_license
             )
             user_profile.save()
-            send_activation_email(user)
+            account_activation_token = TokenGenerator()
+            url = settings.CORS_ORIGIN_WHITELIST[1] + "/login/?action=activate&uid={}&token={}".format(
+                urlsafe_base64_encode(force_bytes(user.pk)),
+                account_activation_token.make_token(user)
+            )
+            send_email(
+                'noreply@trauxerp.com',
+                [activation_license.client.email],
+                get_message(1000, 7),
+                get_message(1000, 8).format(user.first_name, url, url)
+            )
 
         except License.DoesNotExist as e:
-            return Response({"code": 4001,  "message": e.__str__()}, 400)
+            return get_response(400, 1, e)
         except IntegrityError as e:
-            return Response({"code": 4002,  "message": e.__str__()}, 400)
+            return get_response(400, 2, e)
+        except UserProfile.DoesNotExist as e:
+            return get_response(500, 1, e)
         except IndexError as e:
-            return Response({"code": 5001, "message": e.__str__()}, 500)
+            return get_response(500, 2, e)
         except Exception as e:
-            return Response({"code": 5002, "message": e.__str__()}, 500)
+            return get_response(500, 0, e)
 
-        return Response(
-            {
-                "code": (2001 if user.email == activation_license.client.email else 2002),
-                "message": "User registered, activation code sent to license registered email",
-                "email": encode_email_address(activation_license.client.email)
-            }, 201)
+        return get_response(201, 1 if user.email == activation_license.client.email else 2,
+                            {"email": encode_email_address(activation_license.client.email)})
 
     @action(detail=False, methods=['POST'])
     def activate(self, request, **kwargs):
@@ -91,80 +77,74 @@ class UserViewSet(viewsets.ModelViewSet):
             user = User.objects.get(pk=uid)
             account_activation_token = TokenGenerator()
             if user.is_active:
-                return Response({"code": 2004, "message": 'User is already active'}, 200)
-            if account_activation_token.check_token(user, request.data['token']):
-                user.is_active = True
-                user.save()
-                user_profile = UserProfile.objects.get(user=user)
-                client = user_profile.activation_license.client
-                client.users.add(user)
-
-                try:
-                    send_email(
-                        'noreply@trauxerp.com',
-                        [user.email],
-                        get_message(1000, 9),
-                        get_message(1000, 10).format(user.first_name, user.username)
-                    )
-                except IndexError:
-                    pass
-
-                return Response({"code": 2003, "message": 'Account activated'}, 200)
-            else:
-                return Response({"code": 4006, "message": 'Invalid token'}, 400)
-        except KeyError:
-            return Response({"code": 4003, "message": 'Invalid parameters, required fields: [uid, token]'}, 400)
-        except User.DoesNotExist as e:
-            return Response({"code": 4004, "message": e.__str__()}, 400)
-        except UserProfile.DoesNotExist as e:
-            return Response({"code": 4005, "message": e.__str__()}, 400)
+                return get_response(200, 11)
+            if not account_activation_token.check_token(user, request.data['token']):
+                return get_response(400, 10)
+            user.is_active = True
+            user.save()
+            user_profile = UserProfile.objects.get(user=user)
+            client = user_profile.activation_license.client
+            client.users.add(user)
+            send_email(
+                'noreply@trauxerp.com',
+                [user.email],
+                get_message(1000, 9),
+                get_message(1000, 10).format(user.first_name, user.username)
+            )
+            return get_response(200, 10)
+        except User.DoesNotExist:
+            return get_response(400, 11)
+        except KeyError as e:
+            return get_response(400, 12, e)
+        except UserProfile.DoesNotExist:
+            return get_response(500, 11)
+        except IndexError as e:
+            return get_response(500, 12, e)
         except Exception as e:
-            return Response({"code": 5003, "message": e.__str__()}, 500)
+            return get_response(500, 10, e)
 
     @action(detail=False, methods=['POST'])
-    def send_reset_password_link(self, request, **kwargs):
+    def email_reset_password(self, request, **kwargs):
         try:
-            activation_license = License.objects.get(number=request.data['license'])
-            user = User.objects.get(pk=uid)
-            user_profile = UserProfile.objects.create(
-                user=user,
-                activation_license=activation_license
+            user = User.objects.get(username=request.data['username'])
+            token_generator = PasswordResetTokenGenerator()
+            url = settings.CORS_ORIGIN_WHITELIST[1] + "/forgotpassword/?action=reset&uid={}&token={}".format(
+                urlsafe_base64_encode(force_bytes(user.pk)),
+                token_generator.make_token(user)
             )
-            user_profile.save()
-            send_activation_email(user)
-
-        except License.DoesNotExist as e:
-            return Response({"code": 4006,  "message": e.__str__()}, 400)
-        except IntegrityError as e:
-            return Response({"code": 4007,  "message": e.__str__()}, 400)
+            send_email(
+                'noreply@trauxerp.com',
+                [user.email],
+                get_message(1000, 11),
+                get_message(1000, 12).format(user.first_name, url, url)
+            )
+            return get_response(200, 20)
         except IndexError as e:
-            return Response({"code": 5001, "message": e.__str__()}, 500)
+            return get_response(400, 20, e)
+        except User.DoesNotExist:
+            return get_response(400, 21)
         except Exception as e:
-            return Response({"code": 5002, "message": e.__str__()}, 500)
+            return get_response(500, 20, e)
 
-        return Response(
-            {
-                "code": (2001 if user.email == activation_license.client.email else 2002),
-                "message": "User registered, activation code sent to license registered email",
-                "email": encode_email_address(activation_license.client.email)
-            }, 201)
-
-
-#######################################################################################################################
-#                                                     Tool box                                                        #
-#######################################################################################################################
-
-
-# class MessageSetViewSet(viewsets.ModelViewSet):
-#     queryset = MessageSet.objects.all()
-#     serializer_class = MessageSetSerializer
-#     permission_classes = [AllowAny]
-#
-#
-# class MessageCatalogViewSet(viewsets.ModelViewSet):
-#     queryset = MessageCatalog.objects.all()
-#     serializer_class = MessageCatalogSerializer
-#     permission_classes = [AllowAny]
+    @action(detail=False, methods=['POST'])
+    def reset_password(self, request, **kwargs):
+        try:
+            uid = force_text(urlsafe_base64_decode(request.data['uid']))
+            user = User.objects.get(pk=uid)
+            token_generator = PasswordResetTokenGenerator()
+            if not user.is_active:
+                return get_response(400, 30)
+            if not token_generator.check_token(user, request.data['token']):
+                return get_response(400, 31)
+            user.set_password(request.data['password'])
+            user.save()
+            return get_response(200, 30, {'username': user.username})
+        except User.DoesNotExist:
+            return get_response(400, 32)
+        except KeyError as e:
+            return get_response(400, 33, e)
+        except Exception as e:
+            return get_response(500, 10, e)
 
 
 #######################################################################################################################
@@ -221,26 +201,3 @@ class WebConsultViewSet(viewsets.ModelViewSet):
                     )
                 )
         return response
-
-
-#######################################################################################################################
-#                                                    Accounts                                                         #
-#######################################################################################################################
-
-
-# class ClientViewSet(viewsets.ModelViewSet):
-#     queryset = Client.objects.all()
-#     serializer_class = ClientSerializer
-#     permission_classes = [AllowAny]
-#
-#
-# class ModuleViewSet(viewsets.ModelViewSet):
-#     queryset = Module.objects.all()
-#     serializer_class = ModuleSerializer
-#     permission_classes = [AllowAny]
-#
-#
-# class LicenseViewSet(viewsets.ModelViewSet):
-#     queryset = License.objects.all()
-#     serializer_class = LicenseSerializer
-#     permission_classes = [AllowAny]

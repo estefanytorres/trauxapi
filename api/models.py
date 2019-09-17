@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import date
 
 #######################################################################################################################
 #                                                     Tool box                                                        #
@@ -109,13 +110,13 @@ class Module(models.Model):
 class License(models.Model):
     client = models.ForeignKey(Client, on_delete=models.PROTECT)
     number = models.CharField(max_length=12, unique=True)
-    allowed_users = models.IntegerField(null=True)
+    allowed_users = models.IntegerField(default=0, blank=True)
     active = models.BooleanField(default=False)
-    activation_code = models.CharField(max_length=150, default=None, null=True)
-    activation_date = models.DateTimeField(default=None, null=True)
-    modules = models.ManyToManyField(Module)
-    start_date = models.DateField(null=True)
-    end_date = models.DateField(null=True)
+    activation_code = models.CharField(max_length=150, default=None, null=True, blank=True)
+    activation_date = models.DateTimeField(default=None, null=True, blank=True)
+    modules = models.ManyToManyField(Module, blank=True)
+    start_date = models.DateField(default=None, null=True, blank=True)
+    end_date = models.DateField(default=None, null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
 
