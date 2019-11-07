@@ -253,9 +253,8 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
             # file_transaction.files_in.add(file)
 
             content = file_in.read()
-            # invoice = Invoice(content)
-            # out_content = invoice.to_csv()
-            out_content = content
+            invoice = Invoice(content)
+            out_content = invoice.to_csv()
 
         # Save the output file
         # out_file_name = '%i_%i.txt' % (file_transaction.user.pk, file_transaction.pk)
