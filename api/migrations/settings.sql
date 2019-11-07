@@ -107,7 +107,7 @@ INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, messag
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (1000, 9, 'Correo usuario activado - subject', 'Bienvenido');
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (1000, 10, 'Correo usuario activado - body', '<div style="margin: 1em auto;max-width: 600px; padding: 2em; border-radius: 10px;">
 <h2>Bienvenido(a) {}!</h2>
-<p>A traves de esta comunicación hacemos de su conocimiento que su registro ha quedado almacenado con el usuario {} y la contraseña que usted especificó</p>
+<p>A través de esta comunicación hacemos de su conocimiento que su registro ha quedado almacenado con el usuario {} y la contraseña que usted especificó</p>
 <br>
 <p>Gracias por confiar en nosotros,
 <br>

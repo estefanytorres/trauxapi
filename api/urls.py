@@ -4,8 +4,11 @@ from api import views
 
 router = routers.DefaultRouter()
 
-router.register(r'users', views.UserViewSet)
+router.register(r'user', views.UserViewSet)
 router.register(r'web_consult', views.WebConsultViewSet)
+router.register(r'client', views.ClientViewSet)
+router.register(r'file_transaction', views.FileTransactionViewSet)
+router.register(r'file', views.FileViewSet)
 
 # router.register(r'toolbox/message/set', views.MessageSetViewSet)
 # router.register(r'toolbox/message/catalog', views.MessageCatalogViewSet)

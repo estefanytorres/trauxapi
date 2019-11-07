@@ -5,7 +5,9 @@ from api.models import (
     Client,
     Module,
     License,
-    UserProfile
+    UserProfile,
+    File,
+    FileTransaction
 )
 
 # Register your models here.
@@ -15,3 +17,5 @@ admin.site.register(UserProfile)
 admin.site.register(Client)
 admin.site.register(Module)
 admin.site.register(License)
+admin.site.register(File)
+admin.site.register(FileTransaction)

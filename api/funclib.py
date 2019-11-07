@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from .models import MessageSet, MessageCatalog
 # Installed packages
 from html2text import html2text
+import xml.etree.ElementTree as ET
+import pandas as pd
 
 
 def send_email(sender, recipient, subject, body):
@@ -67,3 +69,82 @@ class TokenGenerator(PasswordResetTokenGenerator):
             six.text_type(user.pk) + six.text_type(timestamp) +
             six.text_type(user.is_active)
         )
+
+
+class InvoiceLine:
+
+    def __init__(self):
+        self.code = None
+        self.description = None
+        self.depot = 'Principal'
+        self.verified = 0
+        self.quantity = 0
+        self.unit = 'Und.'
+        self.price = 0.0
+        self.tax = 0.0
+
+
+class Invoice:
+
+    def __init__(self, xml_text):
+
+        self.xml = xml_text
+        self.client = None
+        self.clientID = None
+        self.clientCode = None
+        self.document = 'FV'
+        self.prefix = ''
+        self.number = None
+        self.date = None
+        self.expiry_date = None
+        self.collector = 0
+        self.payment_form = 'Credito'
+        self.cost_center = 'OPERACIONAL'
+        self.null = 0
+        self.discount = 0
+        self.factor = 0
+        self.mov_factor = 0
+        self.cost_tax = 0
+        self.pers1 = ''
+        self.lines = []
+
+        cac = '{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}'
+        cbc = '{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}'
+        root = ET.fromstring(self.xml)
+        document = ET.fromstring(
+            root.find(cac + 'Attachment').find(cac + 'ExternalReference').find(cbc + 'Description').text)
+        self.client = document.find(cac + 'AccountingCustomerParty').find(cac + 'Party').find(
+            cac + 'PartyTaxScheme').find(cbc + 'RegistrationName').text
+        self.clientID = document.find(cac + 'AccountingCustomerParty').find(cac + 'Party').find(
+            cac + 'PartyTaxScheme').find(cbc + 'CompanyID').text
+        self.number = document.find(cbc + 'ID').text
+        self.date = document.find(cbc + 'IssueDate').text
+        self.expiry_date = document.find(cbc + 'DueDate').text
+        for node in document.findall(cac + 'InvoiceLine'):
+            line = InvoiceLine()
+            line.code = node.find(cac + 'Item').find(cac + 'SellersItemIdentification').find(cbc + 'ID').text
+            line.description = node.find(cac + 'Item').find(cbc + 'Description').text
+            line.quantity = node.find(cbc + 'InvoicedQuantity').text
+            line.price = node.find(cbc + 'LineExtensionAmount').text
+            line.tax = node.find(cac + 'TaxTotal').find(cac + 'TaxSubtotal').find(cac + 'TaxCategory').find(
+                cbc + 'Percent').text
+            line.tax = float(line.tax)/100
+            self.lines.append(line)
+
+    def to_csv(self):
+
+        header = ['Empresa', 'Documento', 'Prefijo', 'Num.Documento', 'Fecha', 'IdTerceroExterno', 'Tercero Interno',
+                  'Recaudador', 'Nota', 'Verificado', 'Forma de Pago', 'Codigo Descripcion', 'Bodega', 'Cantidad',
+                  'Unidad de Medida', 'Valor Unitario', 'Iva', 'Vencimiento', 'Centro de Costo', 'Tercero', 'Anulado',
+                  'Descuento', 'Factor', 'Factormov', 'IvaalCosto', 'Personalizado1']
+        csv = []
+        for line in self.lines:
+            csv.append([self.client, self.document, self.prefix, self.number, self.date, self.clientID, self.clientID,
+                        self.collector, line.description, line.verified, self.payment_form, line.code, line.depot,
+                        line.quantity,
+                        line.unit, line.price, line.tax, self.expiry_date, self.cost_center, self.clientID, self.null,
+                        self.discount, self.factor, self.mov_factor, self.cost_tax, self.pers1])
+
+        return pd.DataFrame(csv, columns=header).to_csv(index=False)
+
+

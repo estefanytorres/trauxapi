@@ -1,17 +1,24 @@
 from django.conf import settings
+from django.core.files.base import File, ContentFile
+from django.core.files.storage import Storage
 from django.db import IntegrityError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from .funclib import (
     send_email,
     get_message,
     TokenGenerator,
     encode_email_address,
-    get_response
+    get_response,
+    Invoice,
+    InvoiceLine
 )
 from .serializers import *
 from .models import *
@@ -146,6 +153,10 @@ class UserViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return get_response(500, 10, e)
 
+#######################################################################################################################
+#                                                   Tool box                                                          #
+#######################################################################################################################
+
 
 #######################################################################################################################
 #                                                    Website                                                          #
@@ -201,3 +212,62 @@ class WebConsultViewSet(viewsets.ModelViewSet):
                     )
                 )
         return response
+
+
+#######################################################################################################################
+#                                                      App                                                            #
+#######################################################################################################################
+
+class ClientViewSet(viewsets.ModelViewSet):
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+
+    def get_queryset(self):
+        return Client.objects.filter(users__username=self.request.user, active=True)
+
+
+class FileViewSet(viewsets.ModelViewSet):
+    queryset = File.objects.all()
+    serializer_class = FileSerializer
+
+
+class FileTransactionViewSet(viewsets.ModelViewSet):
+    queryset = FileTransaction.objects.all()
+    serializer_class = FileTransactionSerializer
+    parser_class = (FileUploadParser,)
+
+    def create(self, request, *args, **kwargs):
+
+        # print(self.request.data)
+        out_content = ''
+        file_transaction = FileTransaction.objects.create(
+            user=self.request.user,
+            type=self.request.data['type']
+        )
+
+        for file_in in request.FILES.getlist('files_in'):
+
+            # Save the input files
+            # file = File.objects.create(file=file_in, type='XML')
+            # file.save()
+            # file_transaction.files_in.add(file)
+
+            content = file_in.read()
+            invoice = Invoice(content)
+            out_content = invoice.to_csv()
+
+        # Save the output file
+        # out_file_name = '%i_%i.txt' % (file_transaction.user.pk, file_transaction.pk)
+        # out_file = File.objects.create(type='TXT')
+        # out_file.file.save(out_file_name, ContentFile(out_content))
+        # file_transaction.files_out.add(out_file)
+
+        file_transaction.save()
+        return get_response(201, 100, out_content)
+
+
+
+
+
+
+

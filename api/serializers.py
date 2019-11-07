@@ -1,6 +1,12 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import *
+from .models import (
+    File,
+    FileTransaction,
+    WebConsult,
+    Client,
+    License
+)
 
 
 #######################################################################################################################
@@ -20,18 +26,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 #######################################################################################################################
 
 
-# class MessageSetSerializer(serializers.HyperlinkedModelSerializer):
-#
-#     class Meta:
-#         model = MessageSet
-#         fields = ('url', 'message_set', 'title', 'description')
-#
-#
-# class MessageCatalogSerializer(serializers.HyperlinkedModelSerializer):
-#
-#     class Meta:
-#         model = MessageCatalog
-#         fields = ('url', 'message_set', 'message_nbr', 'description', 'message')
 
 
 #######################################################################################################################
@@ -50,22 +44,31 @@ class WebConsultSerializer(serializers.HyperlinkedModelSerializer):
 #######################################################################################################################
 
 
-# class ClientSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = Client
-#         fields = '__all__'
-#
-#
-# class ModuleSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = Module
-#         fields = '__all__'
-#
-#
-# class LicenseSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = License
-#         fields = '__all__'
+class LicenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = License
+        fields = ('pk', 'number', 'type', 'allowed_users', 'start_date', 'end_date')
+        depth = 1
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    license_set = LicenseSerializer(many=True)
+
+    class Meta:
+        model = Client
+        fields = ('pk', 'name', 'license_set')
+
+
+class FileSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = File
+        fields = "__all__"
+
+
+class FileTransactionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = FileTransaction
+        fields = "__all__"
 
 
 # https://stackoverflow.com/questions/53404738/how-to-send-email-with-django-rest-framwork
