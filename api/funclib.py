@@ -131,20 +131,23 @@ class Invoice:
             line.tax = float(line.tax)/100
             self.lines.append(line)
 
-    def to_csv(self):
 
-        header = ['Empresa', 'Documento', 'Prefijo', 'Num.Documento', 'Fecha', 'IdTerceroExterno', 'Tercero Interno',
-                  'Recaudador', 'Nota', 'Verificado', 'Forma de Pago', 'Codigo Descripcion', 'Bodega', 'Cantidad',
-                  'Unidad de Medida', 'Valor Unitario', 'Iva', 'Vencimiento', 'Centro de Costo', 'Tercero', 'Anulado',
-                  'Descuento', 'Factor', 'Factormov', 'IvaalCosto', 'Personalizado1']
-        csv = []
-        for line in self.lines:
-            csv.append([self.client, self.document, self.prefix, self.number, self.date, self.clientID, self.clientID,
-                        self.collector, line.description, line.verified, self.payment_form, line.code, line.depot,
-                        line.quantity,
-                        line.unit, line.price, line.tax, self.expiry_date, self.cost_center, self.clientID, self.null,
-                        self.discount, self.factor, self.mov_factor, self.cost_tax, self.pers1])
+def xml_transform(xml_collection):
 
-        return pd.DataFrame(csv, columns=header).to_csv(index=False)
+    header = ['Empresa', 'Documento', 'Prefijo', 'Num.Documento', 'Fecha', 'IdTerceroExterno', 'Tercero Interno',
+              'Recaudador', 'Nota', 'Verificado', 'Forma de Pago', 'Codigo Descripcion', 'Bodega', 'Cantidad',
+              'Unidad de Medida', 'Valor Unitario', 'Iva', 'Vencimiento', 'Centro de Costo', 'Tercero', 'Anulado',
+              'Descuento', 'Factor', 'Factormov', 'IvaalCosto', 'Personalizado1']
+    content = []
+    for xml in xml_collection:
+        invoice = Invoice(xml)
+        for line in invoice.lines:
+            content.append([invoice.client, invoice.document, invoice.prefix, invoice.number, invoice.date,
+                            invoice.clientID, invoice.clientID, invoice.collector, line.description, line.verified,
+                            invoice.payment_form, line.code, line.depot, line.quantity, line.unit, line.price, line.tax,
+                            invoice.expiry_date, invoice.cost_center, invoice.clientID, invoice.null, invoice.discount,
+                            invoice.factor, invoice.mov_factor, invoice.cost_tax, invoice.pers1])
+
+    return pd.DataFrame(content, columns=header).to_csv(index=False)
 
 

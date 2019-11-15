@@ -41,11 +41,11 @@ INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, messag
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 12, 'User.activate()', 'Parametros inválidos, parametros necesarios: [uid, token]');
 
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 20, 'User.email_reset_password()', 'Parametros inválidos, parametros necesarios: [username]');
-INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 21, 'User.email_reset_password()', 'Usuario inválido');
+INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 21, 'User.email_reset_password()', 'Usuario inválido: Este usuario no se encuentra en nuestra base de datos');
 
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 30, 'User.reset_password()', 'Usuario inactivo');
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 31, 'User.reset_password()', 'Token inválido');
-INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 32, 'User.reset_password()', 'Usuario inválido');
+INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 32, 'User.reset_password()', 'Usuario inválido: Este usuario no se encuentra en nuestra base de datos');
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 33, 'User.reset_password()', 'Parametros inválidos, parametros necesarios: [uid, token, password]');
 
 

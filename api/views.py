@@ -17,8 +17,7 @@ from .funclib import (
     TokenGenerator,
     encode_email_address,
     get_response,
-    Invoice,
-    InvoiceLine
+    xml_transform
 )
 from .serializers import *
 from .models import *
@@ -238,14 +237,16 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
 
-        # print(self.request.data)
+        print(self.request.data)
         out_content = ''
         file_transaction = FileTransaction.objects.create(
             user=self.request.user,
             type=self.request.data['type']
         )
-
-        for file_in in request.FILES.getlist('files_in'):
+        xml_collection = []
+        files = request.FILES.getlist('files_in')
+        print('file size:', len(files))
+        for file_in in files:
 
             # Save the input files
             # file = File.objects.create(file=file_in, type='XML')
@@ -253,9 +254,10 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
             # file_transaction.files_in.add(file)
 
             content = file_in.read()
-            invoice = Invoice(content)
-            out_content = invoice.to_csv()
-
+            xml_collection.append(content)
+            # invoice = Invoice(content)
+            # out_content = invoice.to_csv()
+        out_content = xml_transform(xml_collection)
         # Save the output file
         # out_file_name = '%i_%i.txt' % (file_transaction.user.pk, file_transaction.pk)
         # out_file = File.objects.create(type='TXT')

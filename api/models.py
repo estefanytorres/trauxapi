@@ -53,7 +53,7 @@ class File(models.Model):
 
 class FileTransaction(models.Model):
 
-    TYPE_CHOICES = [('XMLTOTEXT', 'XML a texto plano')]
+    TYPE_CHOICES = [('XMLTOCSV', 'XML a CSV'), ('XMLTOTEXT', 'XML a texto plano')]
 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
