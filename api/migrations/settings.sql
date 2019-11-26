@@ -29,8 +29,10 @@ INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, messag
 
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (201, 1, 'User.register()', 'Usuario creado con éxito, correo de activacion enviado');
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (201, 2, 'User.register()', 'Usuario creado con éxito, correo de activacion enviado a la dirección registrada para la licencia ingresada');
+INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (201, 100, 'FileTransaction.create()', 'Transacción processada con éxito');
 
--- message_set: 400 - Mensajes de exito error
+
+-- message_set: 400 - Mensajes de error
 ---------------------------------------------------------
 
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (400, 1, 'User.register()', 'La licencia es inválida');
@@ -64,6 +66,8 @@ INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, messag
 
 INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (500, 30, 'User.reset_password()', 'Error inesperado al reestablecer la contraseña');
 
+
+INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (500, 100, 'FileTransaction.create()', 'Error inesperado');
 -- message_set: 1000 - Comunicaciones
 ---------------------------------------------------------
 
