@@ -243,7 +243,7 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
         )
         xml_collection = []
         files = request.FILES.getlist('files_in')
-
+        print('Checkpoint 1')
         for file_in in files:
             # Save the input files
             file = File.objects.create(file=file_in, type='XML')
@@ -252,16 +252,19 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
             # Collect text to process
             content = file.file.read()
             xml_collection.append(content)
-
+        print('Checkpoint 2')
         # Produce output
         out_content = xml_transform(xml_collection)
+        print('Checkpoint 3')
         # Save the output file
         out_file_name = '%i_%i.csv' % (file_transaction.user.pk, file_transaction.pk)
         out_file = File.objects.create(type='CSV')
         out_file.file.save(out_file_name, ContentFile(out_content))
+        print('Checkpoint 4')
         # Save the file transaction
         file_transaction.files_out.add(out_file)
         file_transaction.save()
+        print('Checkpoint 5')
         # Email output file(s)
         if file_transaction.user.email:
             send_email(
@@ -274,7 +277,8 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
                 ),
                 [file.path() for file in file_transaction.files_out.all()]
             )
-
+        print('Checkpoint 6')
+        print(out_content[:10])
         return get_response(201, 100, out_content)
 
 
