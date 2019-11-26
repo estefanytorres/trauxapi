@@ -123,3 +123,13 @@ INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, messag
 <p>El equipo traux</p>
 <img src="https://www.trauxerp.com/assets/logo-sinescrito.png" style="width: 150px">
 </div>');
+INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (1000, 13, 'Correo transacción de archivo - subject', 'Transacción de archivo');
+INSERT INTO api_messagecatalog (message_set_id, message_nbr, description, message) VALUES (1000, 14, 'Correo transacción de archivo - body',
+'<div style="margin: 1em auto;max-width: 600px; padding: 2em; border-radius: 10px;">
+<h2>Hola {}!</h2>
+<p>El archivo adjunto se ha generado a partir de los siguientes archivos XML:</p>
+<ul>{}</ul>
+<br>
+<p>El equipo traux</p>
+<img src="https://www.trauxerp.com/assets/logo-sinescrito.png" style="width: 150px">
+</div>');

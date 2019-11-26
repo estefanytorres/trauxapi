@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 
 
-def send_email(sender, recipient, subject, body):
+def send_email(sender, recipient, subject, body, attachments=[]):
     if settings.ENV != 'PRD':
         subject = '[' + settings.ENV + '] ' + subject
         body = '<p><b>environment:</b> {}<br><b>send_from:</b> {}<br><b>send_to:</b> {}<br></p><hr>'.format(
@@ -26,6 +26,9 @@ def send_email(sender, recipient, subject, body):
 
     email = EmailMultiAlternatives(subject, html2text(body), sender, recipient)
     email.attach_alternative(body, "text/html")
+    if len(attachments) > 0:
+        for attachment in attachments:
+            email.attach_file(attachment)
     email.send()
 
 

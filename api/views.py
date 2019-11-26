@@ -237,34 +237,44 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
 
-        print(self.request.data)
-        out_content = ''
         file_transaction = FileTransaction.objects.create(
             user=self.request.user,
             type=self.request.data['type']
         )
         xml_collection = []
         files = request.FILES.getlist('files_in')
-        print('file size:', len(files))
+
         for file_in in files:
-
             # Save the input files
-            # file = File.objects.create(file=file_in, type='XML')
-            # file.save()
-            # file_transaction.files_in.add(file)
-
-            content = file_in.read()
+            file = File.objects.create(file=file_in, type='XML')
+            file.save()
+            file_transaction.files_in.add(file)
+            # Collect text to process
+            content = file.file.read()
             xml_collection.append(content)
-            # invoice = Invoice(content)
-            # out_content = invoice.to_csv()
+
+        # Produce output
         out_content = xml_transform(xml_collection)
         # Save the output file
-        # out_file_name = '%i_%i.txt' % (file_transaction.user.pk, file_transaction.pk)
-        # out_file = File.objects.create(type='TXT')
-        # out_file.file.save(out_file_name, ContentFile(out_content))
-        # file_transaction.files_out.add(out_file)
-
+        out_file_name = '%i_%i.csv' % (file_transaction.user.pk, file_transaction.pk)
+        out_file = File.objects.create(type='CSV')
+        out_file.file.save(out_file_name, ContentFile(out_content))
+        # Save the file transaction
+        file_transaction.files_out.add(out_file)
         file_transaction.save()
+        # Email output file(s)
+        if file_transaction.user.email:
+            send_email(
+                'noreply@trauxerp.com',
+                [file_transaction.user.email],
+                get_message(1000, 13),
+                get_message(1000, 14).format(
+                    file_transaction.user.first_name,
+                    '\n'.join(['<li>'+file.file.name+'</li>' for file in file_transaction.files_in.all()])
+                ),
+                [file.path() for file in file_transaction.files_out.all()]
+            )
+
         return get_response(201, 100, out_content)
 
 

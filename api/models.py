@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 #######################################################################################################################
 #                                                     Tool box                                                        #
@@ -49,6 +50,9 @@ class File(models.Model):
 
     def __str__(self):
         return self.file.name
+
+    def path(self):
+        return settings.MEDIA_ROOT+'\\'+self.file.name
 
 
 class FileTransaction(models.Model):
