@@ -236,7 +236,7 @@ class FileTransactionViewSet(viewsets.ModelViewSet):
     parser_class = (FileUploadParser,)
 
     def create(self, request, *args, **kwargs):
-
+        print('file_transaction')
         file_transaction = FileTransaction.objects.create(
             user=self.request.user,
             type=self.request.data['type']
