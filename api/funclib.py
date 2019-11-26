@@ -60,7 +60,7 @@ def get_response(status, code, data=None):
     if status < 300:
         return Response({'status': status, 'code': code, 'message': message, 'data': data}, status)
     else:
-        if data:
+        if data and not settings.PRODUCTION:
             return Response({'status': status, 'code': code, 'message': message, 'exception': data.__str__()}, status)
         else:
             return Response({'status': status, 'code': code, 'message': message}, status)
