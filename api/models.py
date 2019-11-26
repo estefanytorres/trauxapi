@@ -52,7 +52,7 @@ class File(models.Model):
         return self.file.name
 
     def path(self):
-        return settings.MEDIA_ROOT+'\\'+self.file.name
+        return settings.MEDIA_ROOT+'/'+self.file.name
 
 
 class FileTransaction(models.Model):

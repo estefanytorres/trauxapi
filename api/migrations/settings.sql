@@ -1,7 +1,9 @@
+DELETE FROM api_messagecatalog where message_set_id < 2000;
+DELETE FROM api_messageset where message_set < 2000;
+
 -----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------  api_messageset  -------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------
-DELETE FROM api_messageset where message_set < 2000;
 
 INSERT INTO api_messageset (message_set, title, description) VALUES (200, 'Mensajes de éxito', 'Mensajes de la api');
 INSERT INTO api_messageset (message_set, title, description) VALUES (201, 'Mensajes de creación', 'Mensajes de la api');
@@ -12,7 +14,6 @@ INSERT INTO api_messageset (message_set, title, description) VALUES (1000, 'Comu
 -----------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------  api_messagecatalog  ----------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------
-DELETE FROM api_messagecatalog where message_set_id < 2000;
 
 -- message_set: 200 - Mensajes de exito
 ---------------------------------------------------------
